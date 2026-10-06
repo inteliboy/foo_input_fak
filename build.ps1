@@ -12,7 +12,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
-$fakRev = "1a68a3b7e07f6549ada69724dd400154b6fb5aab"
+$fakRev = "f30902c7ab23803a9354a45e3249cdb26ae01bf9"
 
 Push-Location "$here\capi"
 try {

@@ -2,7 +2,7 @@
 
 DECLARE_COMPONENT_VERSION(
 	"FAK Lossless Audio (Advanced)",
-	"1.1.1",
+	"1.1.3",
 	"Everything in foo_input_fak, plus conversion and settings inside foobar2000.\n\n"
 	"Playback, tagging and album art for FAK (.fak) lossless audio files. Decoding is bit-exact; tags and\n"
 	"pictures are rewritten without touching the audio. The decoder reads exactly one format version (see the\n"

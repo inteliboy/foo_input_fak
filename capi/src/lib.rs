@@ -615,7 +615,7 @@ fn build_meta(
         (e.sample_rate as usize).saturating_mul(chunk_seconds as usize).clamp(1, format::MAX_CHUNK_FRAMES as usize)
     };
     // Like FLAC's vendor string, but with what was asked of the encoder (the level itself is not
-    // recoverable from the stream): "fak 1.1.0 (foo_input_fak 1.1.1; level=insane; fec=RS whole-file; chunk=auto)".
+    // recoverable from the stream): "fak 1.1.3 (foo_input_fak 1.1.3; level=insane; fec=RS whole-file; chunk=auto)".
     meta.vendor = format!(
         "fak {} (foo_input_fak {}; level={}; fec={}; chunk={})", fak::LIB_VERSION, env!("CARGO_PKG_VERSION"),
         ["fast", "normal", "max", "insane"][level as usize],
