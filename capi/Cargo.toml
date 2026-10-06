@@ -1,0 +1,18 @@
+[package]
+name = "fak_capi"
+version = "1.0.0"
+edition = "2021"
+description = "C ABI over the FAK decoder/metadata library, for the foobar2000 component (foo_input_fak)"
+
+[lib]
+crate-type = ["staticlib"]
+path = "src/lib.rs"
+
+[dependencies]
+fak = { git = "https://github.com/inteliboy/FAK-Codec", rev = "3aa1f1f97339bd25032fcd1b8234d6111457fd25", default-features = false }
+mimalloc = { version = "0.1", default-features = false }
+libmimalloc-sys = { version = "0.1", default-features = false, features = ["extended"] }
+
+[profile.release]
+opt-level = 3
+panic = "unwind"

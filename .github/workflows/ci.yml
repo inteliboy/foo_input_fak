@@ -1,0 +1,26 @@
+# Builds the Rust C-ABI library against the pinned FAK-Codec revision. The component itself needs the
+# foobar2000 SDK, which is not redistributed here, so it is built locally (see README.md).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  capi:
+    runs-on: windows-2025
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: rustup toolchain install stable --profile minimal && rustup default stable && rustc -Vv
+      - name: Build fak_capi
+        working-directory: capi
+        run: cargo build --release --locked
