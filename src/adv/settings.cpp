@@ -1,4 +1,5 @@
 #include "fak_common.h"
+#include "fak_settings.h"
 
 // Persistent settings of the conversion menu. Stored with foobar2000's
 // modern cfg_var types, so they follow the profile.

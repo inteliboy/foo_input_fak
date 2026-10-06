@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5E1F0C6B-3A7D-4F0E-9C2B-7D1A4B8E6F21}</ProjectGuid>
-    <RootNamespace>foo_input_fak</RootNamespace>
+    <ProjectGuid>{151C0C43-6FC9-405B-AA48-ACF7BB0F42BD}</ProjectGuid>
+    <RootNamespace>foo_input_fak_adv</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <!-- foobar2000 SDK location (see README.md). -->
     <Fb2kSdk Condition="'$(Fb2kSdk)'==''">$(MSBuildThisFileDirectory)..\sdk\</Fb2kSdk>
@@ -32,7 +32,7 @@
   <PropertyGroup>
     <OutDir>$(MSBuildThisFileDirectory)..\build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(MSBuildThisFileDirectory)..\build\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>foo_input_fak</TargetName>
+    <TargetName>foo_input_fak_adv</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -40,7 +40,7 @@
       <TreatSpecificWarningsAsErrors>4715</TreatSpecificWarningsAsErrors>
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)common;$(Fb2kSdk)foobar2000;$(Fb2kSdk);$(CapiDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;FAK_ADV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
@@ -73,14 +73,18 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="basic\main.cpp" />
+    <ClCompile Include="adv\main.cpp" />
     <ClCompile Include="common\input_fak.cpp" />
     <ClCompile Include="common\converter_preset.cpp" />
     <ClCompile Include="common\cue_helpers.cpp" />
+    <ClCompile Include="adv\settings.cpp" />
+    <ClCompile Include="adv\prefs.cpp" />
+    <ClCompile Include="adv\convert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\stdafx.h" />
     <ClInclude Include="common\fak_common.h" />
+    <ClInclude Include="adv\fak_settings.h" />
     <ClInclude Include="..\capi\include\fak_capi.h" />
   </ItemGroup>
   <ItemGroup>

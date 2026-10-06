@@ -1,7 +1,22 @@
-# foo_input_fak — foobar2000 component for FAK
+# foo_input_fak — foobar2000 components for FAK
 
 Plays, tags and shows album art for FAK (`.fak`) lossless files in foobar2000 v2 (x64). The codec is in
-[FAK-Codec](https://github.com/inteliboy/FAK-Codec); this component links its decoder.
+[FAK-Codec](https://github.com/inteliboy/FAK-Codec); these components link its decoder. There are two components
+in this repository; install **one** of them:
+
+| | `foo_input_fak` | `foo_input_fak_adv` |
+|---|---|---|
+| Playback, seeking, technical info | yes | yes |
+| Tags, ReplayGain, tag writing; cue sheets; album art | yes | yes |
+| Encoding through the Converter (a `FAK` output format, bundled `fak.exe`) | yes | yes |
+| Right-click `FAK` menu: convert, single file with cue sheet, verify | - | yes |
+| Preferences > Tools > FAK (level, error recovery, output location, ...) | - | yes |
+| Package size | about 1.3 MB | about 1.8 MB |
+
+`foo_input_fak` is the small one: it plays the format and lets the Converter encode it. `foo_input_fak_adv` is
+`foo_input_fak` plus the conversion menu and settings page described below, so it replaces it (it does not need
+it). With both installed every `.fak` file would be claimed twice, so `foo_input_fak_adv` shows a warning at
+startup; remove one of them. Everything below applies to both unless a section says "advanced only".
 
 | Feature | How |
 |---|---|
@@ -13,12 +28,12 @@ Plays, tags and shows album art for FAK (`.fak`) lossless files in foobar2000 v2
 | Cue sheets | An embedded cue sheet (`fak encode --cuesheet`, or a `cuesheet` field written by foobar2000, e.g. when converting a disc image) shows as one playlist entry per track, with per-track titles; editing a track's tags edits the sheet. Uses the SDK's embedded-cuesheet wrapper, as foobar2000's own FLAC input does |
 | CD tags | Opt-in (`fak encode --cd-tags` / `fak edit --cd-tags`). In a file that has them, they are kept current: when the cue sheet's track points change (indices moved; retitling moves nothing), the CD identifiers and AccurateRip/CTDB checksums are recomputed from the audio (`fak::cdrip`, same rule as `fak edit --cuesheet`); removing the sheet drops the `FAK_` ones. A CD tag you changed in the same edit is kept. Files without them get none |
 | Album art | Front/back cover, disc, artist, icon: read, add, replace, remove; other picture types are preserved |
-| Encoding | Right-click > `FAK` (below), or the `FAK` entry that appears in the Converter's output formats using the bundled `fak.exe`; tags are then written by this component |
+| Encoding | The `FAK` entry that appears in the Converter's output formats, using the bundled `fak.exe` (both components); the right-click `FAK` menu (advanced only, below). Tags are then written by the component |
 
 Not yet supported: 32-bit/ARM64 foobar2000 builds, and streaming from non-seekable sources (the
 whole compressed file is read on open; foobar2000's FLAC input reads as it plays).
 
-## Converting from the right-click menu
+## Converting from the right-click menu (`foo_input_fak_adv` only)
 
 Select tracks, right-click, `FAK`:
 
@@ -48,9 +63,9 @@ from: `fak encode --cd-tags` and `fak edit --cd-tags` on the command line, and o
 kept current by the component's tag writer. A file made by the Converter route below does not get them.
 
 What is written into the file: the encoder string names both libraries' versions and the settings asked of
-the encoder, for example `fak 1.0.0 (foo_input_fak 1.0.0; level=insane; fec=1/16; chunk=auto)` (the level is
+the encoder, for example `fak 1.1.0 (foo_input_fak 1.1.0; level=insane; fec=1/16; chunk=auto)` (the level is
 not recoverable from the stream itself, which is why it is written). The command line writes the same form
-(`fak 1.0.0 (level=normal; fec=none; chunk=auto)`). Lossy sources are refused; 8/16/24/32-bit integer and 32-bit float sources are supported (float streams play back as the source's exact float32 values). This is the
+(`fak 1.1.0 (level=normal; fec=none; chunk=auto)`). Lossy sources are refused; 8/16/24/32-bit integer and 32-bit float sources are supported (float streams play back as the source's exact float32 values). This is the
 foobar2000 SDK's context-menu and preferences API; the Converter's own list cannot get a built-in-style
 entry with sliders (see below), and this path does not apply the Converter's DSPs.
 
@@ -60,9 +75,9 @@ On its first start the component adds a `FAK` entry to Converter setup -> Output
 an ordinary custom encoder preset, so Edit changes it (add `--max` or `--insane` to the parameters
 for the slower, smaller levels; see `fak help`) and Remove deletes it for good: it is added once per
 profile, never re-added. Later starts only repair its encoder path if that `fak.exe` no longer
-exists (component moved or reinstalled). The preset is:
+exists (component moved, reinstalled, or switched between the two components). The preset is:
 
-- Encoder file: `fak.exe` (installed with the component, in `profile\user-components-x64\foo_input_fak\`)
+- Encoder file: `fak.exe` (installed with the component, in `profile\user-components-x64\foo_input_fak\` or `...\foo_input_fak_adv\`)
 - Extension: `fak`
 - Parameters: `encode - %d`
 - Format is: lossless; Highest BPS mode supported: 24
@@ -93,16 +108,22 @@ foobar2000 SDK unpacked to `sdk\` next to this file (or anywhere, with `-Fb2kSdk
 https://www.foobar2000.org/SDK (tested with SDK-2026-09-17). The SDK is not redistributed here.
 
 ```
-pwsh build.ps1
+pwsh build.ps1                    # both components
+pwsh build.ps1 -Component basic   # foo_input_fak only (or: adv)
 ```
 
 builds the Rust library in `capi\`, builds the `fak.exe` command-line tool from the FAK-Codec revision pinned in
-`capi/Cargo.toml` and `build.ps1`, and produces `build\Release\foo_input_fak.fb2k-component`. Install it by
-double-clicking, or via Preferences -> Components -> Install.
+`capi/Cargo.toml` and `build.ps1`, and produces `build\Release\foo_input_fak.fb2k-component` and
+`foo_input_fak_adv.fb2k-component`. Install one of them by double-clicking, or via Preferences -> Components ->
+Install.
+
+Layout: `src/common/` is built into both (input, album art, cue sheets, the Converter preset), `src/basic/` and
+`src/adv/` hold what is specific to each (`adv/` has the menu, the conversion engine, the settings and the
+preferences page), and `capi/` is the Rust library both link.
 
 ## Format compatibility
 
-The decoder accepts exactly one format version, shown in the technical info as `fak_version`; the
+The decoder accepts exactly one format version (v21), shown in the technical info as `fak_version`; the
 format is specified in [FAK-Codec](https://github.com/inteliboy/FAK-Codec/blob/main/docs/bitstream-spec.md). Files of another version are rejected with an error
 rather than misdecoded.
 

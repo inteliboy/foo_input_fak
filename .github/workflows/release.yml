@@ -1,8 +1,9 @@
-# Builds the foobar2000 component on a GitHub-hosted Windows runner and publishes it as a GitHub release.
+# Builds the two foobar2000 components (foo_input_fak and foo_input_fak_adv) on a GitHub-hosted Windows runner
+# and publishes them as a GitHub release.
 #
 #   * push a tag `vX.Y.Z` (it must equal the version in capi/Cargo.toml): builds, then creates the release
-#     with foo_input_fak.fb2k-component and a SHA256SUMS file;
-#   * Actions > release > Run workflow with no tag: builds the component as a workflow artifact only;
+#     with both .fb2k-component files and a SHA256SUMS file;
+#   * Actions > release > Run workflow with no tag: builds the components as a workflow artifact only;
 #   * the same with a tag: publishes a release for an existing tag.
 #
 # The foobar2000 SDK is not redistributed here: the workflow downloads the pinned version from foobar2000.org
@@ -51,19 +52,19 @@ jobs:
           $got = (Get-FileHash sdk.7z -Algorithm SHA256).Hash.ToLower()
           if ($got -ne $env:SDK_SHA256) { throw "SDK archive hash mismatch: $got" }
           7z x sdk.7z -osdk -y | Out-Null
-      - name: Build the component
+      - name: Build the components
         shell: pwsh
         run: ./build.ps1 -Fb2kSdk sdk
       - name: Package
         shell: bash
         run: |
           mkdir dist
-          cp build/Release/foo_input_fak.fb2k-component dist/
+          cp build/Release/foo_input_fak.fb2k-component build/Release/foo_input_fak_adv.fb2k-component dist/
           (cd dist && sha256sum * > SHA256SUMS && cat SHA256SUMS)
       - uses: actions/upload-artifact@v4
         with:
           name: foo_input_fak
-          path: dist/foo_input_fak.fb2k-component
+          path: dist/*.fb2k-component
 
   release:
     name: publish release
@@ -84,10 +85,15 @@ jobs:
         run: |
           (cd dist && sha256sum * > SHA256SUMS && cat SHA256SUMS)
           cat > notes.md <<NOTES
-          foobar2000 component for FAK lossless files (foobar2000 v2, x64), built by GitHub Actions from tag \`$TAG\`
+          foobar2000 components for FAK lossless files (foobar2000 v2, x64), built by GitHub Actions from tag \`$TAG\`
           of this repository against the FAK-Codec revision pinned in \`capi/Cargo.toml\`.
 
-          Install: double-click \`foo_input_fak.fb2k-component\`, or Preferences -> Components -> Install.
-          Verify a download with \`sha256sum -c SHA256SUMS\`. The component is not code-signed.
+          Install **one** of the two (double-click the file, or Preferences -> Components -> Install):
+
+          - \`foo_input_fak.fb2k-component\`: playback, tags, album art, cue sheets, and a \`FAK\` output format for the Converter.
+          - \`foo_input_fak_adv.fb2k-component\`: all of that plus the right-click \`FAK\` menu (convert, single file with
+            cue sheet, verify) and the Preferences > Tools > FAK page. It replaces \`foo_input_fak\`.
+
+          Verify a download with \`sha256sum -c SHA256SUMS\`. The components are not code-signed.
           NOTES
-          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --title "foo_input_fak $TAG" --notes-file notes.md --verify-tag
+          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --title "FAK foobar2000 components $TAG" --notes-file notes.md --verify-tag

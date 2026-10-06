@@ -1,4 +1,5 @@
 #include "fak_common.h"
+#include "fak_settings.h"
 #include <cmath>
 #include <functional>
 
