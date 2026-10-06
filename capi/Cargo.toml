@@ -1,6 +1,6 @@
 [package]
 name = "fak_capi"
-version = "1.1.0"
+version = "1.1.1"
 edition = "2021"
 description = "C ABI over the FAK decoder/metadata library, for the foobar2000 component (foo_input_fak)"
 

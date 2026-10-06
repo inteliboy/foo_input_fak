@@ -63,7 +63,7 @@ from: `fak encode --cd-tags` and `fak edit --cd-tags` on the command line, and o
 kept current by the component's tag writer. A file made by the Converter route below does not get them.
 
 What is written into the file: the encoder string names both libraries' versions and the settings asked of
-the encoder, for example `fak 1.1.0 (foo_input_fak 1.1.0; level=insane; fec=1/16; chunk=auto)` (the level is
+the encoder, for example `fak 1.1.0 (foo_input_fak 1.1.1; level=insane; fec=1/16; chunk=auto)` (the level is
 not recoverable from the stream itself, which is why it is written). The command line writes the same form
 (`fak 1.1.0 (level=normal; fec=none; chunk=auto)`). Lossy sources are refused; 8/16/24/32-bit integer and 32-bit float sources are supported (float streams play back as the source's exact float32 values). This is the
 foobar2000 SDK's context-menu and preferences API; the Converter's own list cannot get a built-in-style

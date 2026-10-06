@@ -2,7 +2,7 @@
 
 DECLARE_COMPONENT_VERSION(
 	"FAK Lossless Audio",
-	"1.1.0",
+	"1.1.1",
 	"Playback, tagging and album art for FAK (.fak) lossless audio files.\n"
 	"Decoding is bit-exact; tags and pictures are rewritten without touching the audio.\n\n"
 	"The decoder reads exactly one format version (see the \"fak_version\" technical info field).\n\n"

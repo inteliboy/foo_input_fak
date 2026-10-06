@@ -2,7 +2,7 @@
 
 DECLARE_COMPONENT_VERSION(
 	"FAK Lossless Audio (Advanced)",
-	"1.1.0",
+	"1.1.1",
 	"Everything in foo_input_fak, plus conversion and settings inside foobar2000.\n\n"
 	"Playback, tagging and album art for FAK (.fak) lossless audio files. Decoding is bit-exact; tags and\n"
 	"pictures are rewritten without touching the audio. The decoder reads exactly one format version (see the\n"
@@ -30,7 +30,10 @@ public:
 		while (all.next(c)) {
 			pfc::string8 file;
 			c->get_file_name(file);
-			if (pfc::stringEqualsI_ascii(file.c_str(), "foo_input_fak.dll")) basic_installed = true;
+			// get_file_name() may or may not carry the ".dll" extension (the SDK's own filename validator
+			// reads the full path instead), so accept both spellings.
+			if (pfc::stringEqualsI_ascii(file.c_str(), "foo_input_fak.dll") ||
+				pfc::stringEqualsI_ascii(file.c_str(), "foo_input_fak")) basic_installed = true;
 		}
 		if (basic_installed) {
 			popup_message::g_complain("FAK Lossless Audio (Advanced)",

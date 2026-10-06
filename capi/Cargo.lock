@@ -25,7 +25,7 @@ source = "git+https://github.com/inteliboy/FAK-Codec?rev=1a68a3b7e07f6549ada6972
 
 [[package]]
 name = "fak_capi"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "fak",
  "libmimalloc-sys",
