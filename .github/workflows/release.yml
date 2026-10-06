@@ -1,0 +1,93 @@
+# Builds the foobar2000 component on a GitHub-hosted Windows runner and publishes it as a GitHub release.
+#
+#   * push a tag `vX.Y.Z` (it must equal the version in capi/Cargo.toml): builds, then creates the release
+#     with foo_input_fak.fb2k-component and a SHA256SUMS file;
+#   * Actions > release > Run workflow with no tag: builds the component as a workflow artifact only;
+#   * the same with a tag: publishes a release for an existing tag.
+#
+# The foobar2000 SDK is not redistributed here: the workflow downloads the pinned version from foobar2000.org
+# and checks its SHA-256 before using it. The component is unsigned.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to publish as a release (empty: only build the component as a workflow artifact)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  SDK_URL: https://www.foobar2000.org/files/SDK-2026-09-17.7z
+  SDK_SHA256: 24fa95ed66b42624f593fd4b94c5efb08ae81dfebb92b79fe69c8cd170961e48
+
+jobs:
+  build:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Toolchain
+        shell: bash
+        run: rustup toolchain install stable --profile minimal && rustup default stable && rustc -Vv
+      - name: The tag must match the crate version
+        if: github.event_name == 'push' || inputs.tag != ''
+        shell: bash
+        run: |
+          tag="${{ inputs.tag || github.ref_name }}"
+          crate=$(sed -n 's/^version = "\(.*\)"/\1/p' capi/Cargo.toml | head -1)
+          [ "v$crate" = "$tag" ] || { echo "tag $tag does not match capi/Cargo.toml version $crate"; exit 1; }
+      - name: foobar2000 SDK (downloaded, checked, not redistributed)
+        shell: pwsh
+        run: |
+          Invoke-WebRequest $env:SDK_URL -OutFile sdk.7z
+          $got = (Get-FileHash sdk.7z -Algorithm SHA256).Hash.ToLower()
+          if ($got -ne $env:SDK_SHA256) { throw "SDK archive hash mismatch: $got" }
+          7z x sdk.7z -osdk -y | Out-Null
+      - name: Build the component
+        shell: pwsh
+        run: ./build.ps1 -Fb2kSdk sdk
+      - name: Package
+        shell: bash
+        run: |
+          mkdir dist
+          cp build/Release/foo_input_fak.fb2k-component dist/
+          (cd dist && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: foo_input_fak
+          path: dist/foo_input_fak.fb2k-component
+
+  release:
+    name: publish release
+    needs: build
+    if: github.event_name == 'push' || inputs.tag != ''
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: foo_input_fak
+          path: dist
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          (cd dist && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+          cat > notes.md <<NOTES
+          foobar2000 component for FAK lossless files (foobar2000 v2, x64), built by GitHub Actions from tag \`$TAG\`
+          of this repository against the FAK-Codec revision pinned in \`capi/Cargo.toml\`.
+
+          Install: double-click \`foo_input_fak.fb2k-component\`, or Preferences -> Components -> Install.
+          Verify a download with \`sha256sum -c SHA256SUMS\`. The component is not code-signed.
+          NOTES
+          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --title "foo_input_fak $TAG" --notes-file notes.md --verify-tag

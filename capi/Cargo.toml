@@ -9,7 +9,7 @@ crate-type = ["staticlib"]
 path = "src/lib.rs"
 
 [dependencies]
-fak = { git = "https://github.com/inteliboy/FAK-Codec", rev = "3aa1f1f97339bd25032fcd1b8234d6111457fd25", default-features = false }
+fak = { git = "https://github.com/inteliboy/FAK-Codec", rev = "d0c722dab33f192bf4416923b85ccc353adaeee8", default-features = false }
 mimalloc = { version = "0.1", default-features = false }
 libmimalloc-sys = { version = "0.1", default-features = false, features = ["extended"] }
 
